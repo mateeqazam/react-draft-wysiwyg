@@ -23,29 +23,37 @@ export default class Inline extends Component {
   };
 
   renderInFlatList(): Object {
-    const { config, currentState, onChange, translations } = this.props;
+    const {
+      config, currentState, onChange, translations,
+    } = this.props;
     return (
       <div className={classNames('rdw-inline-wrapper', config.className)} aria-label="rdw-inline-control">
         {
-          config.options
-            .map((style, index) =>
-              (<Option
-                key={index}
-                value={style}
-                onClick={onChange}
-                className={classNames(config[style].className)}
-                active={
-                  currentState[style] === true ||
-                  (style === 'MONOSPACE' && currentState.CODE)
-                }
-                title={config[style].title || translations[`components.controls.inline.${style}`]}
-              >
-                <img
-                  alt=""
-                  src={config[style].icon}
-                />
-              </Option>),
-            )
+          config.options.map((style, index) => {
+            const optionItem = config[style];
+            if (!optionItem) return null;
+            const OptionItemComponent = optionItem.component;
+
+            const propsObj = {
+              key: index,
+              value: style,
+              onClick: onChange,
+              active: (currentState[style] === true || (style === 'MONOSPACE' && currentState.CODE)),
+              title: (config[style].title || translations[`components.controls.inline.${style}`]),
+            };
+            return (
+              OptionItemComponent ? (
+                <OptionItemComponent {...propsObj} />
+              ) : (
+                <Option
+                  {...propsObj}
+                  className={classNames(config[style].className)}
+                >
+                  <img src={config[style].icon} alt="" />
+                </Option>
+              )
+            );
+          })
         }
       </div>
     );
@@ -80,23 +88,30 @@ export default class Inline extends Component {
           alt=""
         />
         {
-          config.options
-            .map((style, index) =>
-              (<DropdownOption
-                key={index}
-                value={style}
-                className={classNames('rdw-inline-dropdownoption', config[style].className)}
-                active={
-                  currentState[style] === true ||
-                  (style === 'MONOSPACE' && currentState.CODE)
-                }
-                title={config[style].title || translations[`components.controls.inline.${style}`]}
-              >
-                <img
-                  src={config[style].icon}
-                  alt=""
-                />
-              </DropdownOption>))
+          config.options.map((style, index) => {
+            const optionItem = config[style];
+            if (!optionItem) return null;
+            const OptionItemComponent = optionItem.component;
+
+            const propsObj = {
+              key: index,
+              value: style,
+              active: (currentState[style] === true || (style === 'MONOSPACE' && currentState.CODE)),
+              title: (config[style].title || translations[`components.controls.inline.${style}`]),
+            };
+            return (
+              OptionItemComponent ? (
+                <OptionItemComponent {...propsObj} />
+              ) : (
+                <DropdownOption
+                  {...propsObj}
+                  className={classNames('rdw-inline-dropdownoption', config[style].className)}
+                >
+                  <img src={config[style].icon} alt="" />
+                </DropdownOption>
+              )
+            );
+          })
         }
       </Dropdown>
     );
